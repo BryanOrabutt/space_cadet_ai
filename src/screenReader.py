@@ -88,21 +88,6 @@ class ScreenReader:
         res = cv2.matchTemplate(table, self.ball_template, cv2.TM_SQDIFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
         pos = (min_loc[0]+int(self.ball_template.shape[0]/2), min_loc[1]+int(self.ball_template.shape[1]/2))
-        # for col in range(table.shape[1]): #cols
-        #     tptr = 0
-        #     bptr = tptr + self.ball_template.shape[0]
-        #     for row in range(table.shape[0]): #rows
-        #         res = cv2.matchTemplate(table[tptr:bptr, lptr:rptr], self.ball_template, cv2.TM_SQDIFF)
-        #         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)  # find min error
-        #         if min_val < err_min:
-        #             # pyplot.imshow(table[tptr:bptr, lptr:rptr])
-        #             # pyplot.show()
-        #             err_min = min_val
-        #             pos = (min_loc[0]+6,min_loc[1]+6)
-        #         tptr += 1
-        #         bptr += 1
-        #     lptr += 1
-        #     rptr += 1
 
         self.ball_pos.append(pos)
         return pos
