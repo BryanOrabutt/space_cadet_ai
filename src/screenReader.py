@@ -30,7 +30,7 @@ class ScreenReader:
             self.digit_template[k] = cv2.cvtColor(self.digit_template[k], cv2.COLOR_BGR2BGRA)  # convert template to BGRA to match digit color map
 
         self.ball_pos = deque(maxlen=20)
-        self.ball_template = cv2.imread(r'C:\Users\frien\PycharmProjects\space_cadet_ai\digit_references\ball.png')
+        self.ball_template = cv2.imread(r'C:\Users\frien\PycharmProjects\space_cadet_ai\digit_references\ball_center.png')
         self.ball_template = cv2.cvtColor(self.ball_template, cv2.COLOR_BGR2BGRA)
 
     def get_window(self):
