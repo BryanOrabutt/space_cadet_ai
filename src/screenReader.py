@@ -87,16 +87,16 @@ class ScreenReader:
     def get_ball_velocity(self):
         sx = (self.ball_pos[0][0], self.ball_pos[1][0]) #current and prev x position
         sy = (self.ball_pos[0][1], self.ball_pos[1][1]) #current and prev y position
-        v = ((sx[0]-sx[1])/self.update_rate, (sy[0]-sy[1])/self.update_rate)
+        v = ((sx[0]-sx[1])/self.update_rate, (sy[0]-sy[1])/self.update_rate) #calculate velocity vector
         return v
 
     def get_ball_pos(self):
-        table = self.screen[44:464, 0:372]
-        res = cv2.matchTemplate(table, self.ball_template, cv2.TM_SQDIFF_NORMED)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        pos = self.ball_pos[0] if len(self.ball_pos) > 0 else (0, 0)
-        if min_val < 0.05:
+        table = self.screen[44:464, 0:372] #remove title bar from window
+        res = cv2.matchTemplate(table, self.ball_template, cv2.TM_SQDIFF_NORMED) #compute MSE from convolution
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res) #find the location with minimum error
+        pos = self.ball_pos[0] if len(self.ball_pos) > 0 else (0, 0) #initialize ball pos to (0,0) or previous position
+        if min_val < 0.05: #if the error is less than 5% then update the ball positon with the new position
             pos = (min_loc[0]+int(self.ball_template.shape[0]/2), min_loc[1]+int(self.ball_template.shape[1]/2))
 
-        self.ball_pos.appendleft(pos)
+        self.ball_pos.appendleft(pos) #append new position to position history array
         return pos
