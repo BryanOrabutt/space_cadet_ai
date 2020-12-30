@@ -1,11 +1,10 @@
 from PIL import ImageGrab
+import numpy as np
 import cv2
 from win32gui import FindWindow, GetWindowRect
-import numpy as np
 import math
-import matplotlib.pyplot as pyplot
 from collections import deque
-import imutils
+import time
 
 
 class ScreenReader:
@@ -30,9 +29,11 @@ class ScreenReader:
             self.digit_template[k] = cv2.cvtColor(self.digit_template[k], cv2.COLOR_BGR2BGRA)  # convert template to BGRA to match digit color map
 
         self.ball_pos = deque(maxlen=20)
+        self.ball_vel = deque(maxlen=20)
         self.ball_template = cv2.imread(r'C:\Users\frien\PycharmProjects\space_cadet_ai\digit_references\ball_center.png')
         self.ball_template = cv2.cvtColor(self.ball_template, cv2.COLOR_BGR2BGRA)
         self.update_rate = 25 #milliseconds
+        self.stuck_timer = 0 #seconds
 
     def set_update_rate(self, rate):
         self.update_rate = rate
@@ -88,7 +89,22 @@ class ScreenReader:
         sx = (self.ball_pos[0][0], self.ball_pos[1][0]) #current and prev x position
         sy = (self.ball_pos[0][1], self.ball_pos[1][1]) #current and prev y position
         v = ((sx[0]-sx[1])/self.update_rate, (sy[0]-sy[1])/self.update_rate) #calculate velocity vector
+        self.ball_vel.appendleft(v)
         return v
+
+    def check_game_over(self):
+        no_change = True
+        prev = self.ball_pos[0]
+        for p in self.ball_pos:
+            no_change = prev == p
+            if no_change is False:
+                self.stuck_timer = time.time()
+                break
+
+        game_over = False
+        if (time.time()-self.stuck_timer) > 10:
+            game_over = True
+        return game_over
 
     def get_ball_pos(self):
         table = self.screen[44:464, 0:372] #remove title bar from window

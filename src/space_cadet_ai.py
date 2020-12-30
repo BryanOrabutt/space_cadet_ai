@@ -1,9 +1,6 @@
 from screenReader import ScreenReader
 import time
-import matplotlib.pyplot as pyplot
 import cv2
-from matplotlib import animation
-
 screen = ScreenReader()
 screen.get_window()
 
