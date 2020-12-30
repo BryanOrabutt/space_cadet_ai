@@ -24,6 +24,6 @@ while True:
     pos = screen.get_ball_pos()
     cv2.circle(img, pos, 6, (0,255,0),2)
     cv2.imshow("Ball tracker", img)
-    key = cv2.waitKey(25)
+    key = cv2.waitKey(15)
     if key & 0xFF is ord('q'):
             break

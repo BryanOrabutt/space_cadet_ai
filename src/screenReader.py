@@ -32,6 +32,13 @@ class ScreenReader:
         self.ball_pos = deque(maxlen=20)
         self.ball_template = cv2.imread(r'C:\Users\frien\PycharmProjects\space_cadet_ai\digit_references\ball_center.png')
         self.ball_template = cv2.cvtColor(self.ball_template, cv2.COLOR_BGR2BGRA)
+        self.update_rate = 25 #milliseconds
+
+    def set_update_rate(self, rate):
+        self.update_rate = rate
+
+    def get_update_rate(self):
+        return self.update_rate
 
     def get_window(self):
         window_title = '3D Pinball for Windows - Space Cadet'
@@ -43,7 +50,6 @@ class ScreenReader:
         return self.screen
 
     def get_score_box(self):
-
         return self.score_box
 
     def process_score(self):
@@ -78,56 +84,19 @@ class ScreenReader:
             count += 1
         return self.score
 
+    def get_ball_velocity(self):
+        sx = (self.ball_pos[0][0], self.ball_pos[1][0]) #current and prev x position
+        sy = (self.ball_pos[0][1], self.ball_pos[1][1]) #current and prev y position
+        v = ((sx[0]-sx[1])/self.update_rate, (sy[0]-sy[1])/self.update_rate)
+        return v
+
     def get_ball_pos(self):
         table = self.screen[44:464, 0:372]
-        lptr = 0
-        rptr = lptr + self.ball_template.shape[1]
-        ball_bbox = [0, 0, 0, 0]
-        err_min = 99999
-        pos = (0, 0)
         res = cv2.matchTemplate(table, self.ball_template, cv2.TM_SQDIFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        pos = (min_loc[0]+int(self.ball_template.shape[0]/2), min_loc[1]+int(self.ball_template.shape[1]/2))
+        pos = self.ball_pos[0] if len(self.ball_pos) > 0 else (0, 0)
+        if min_val < 0.05:
+            pos = (min_loc[0]+int(self.ball_template.shape[0]/2), min_loc[1]+int(self.ball_template.shape[1]/2))
 
-        self.ball_pos.append(pos)
+        self.ball_pos.appendleft(pos)
         return pos
-
-
-        # blurred = cv2.GaussianBlur(table, (11,11), 0)
-        # pyplot.imshow(table)
-        # pyplot.show()
-        #
-        # rgb = cv2.cvtColor(table, cv2.COLOR_BGR2HSV)
-        # pyplot.imshow(rgb)
-        # pyplot.show()
-        #
-        # low_thresh = (0, 0, 0)
-        # high_thresh = (255, 10, 255)
-        # #low_thresh = (170, 0, 89)
-        # #high_thresh = (184, 51, 143)
-        # mask = cv2.inRange(rgb, low_thresh, high_thresh)
-        # kernel = np.ones((3,3), np.uint8)
-        # #mask = cv2.erode(mask, kernel, iterations=1)
-        # #mask = cv2.dilate(mask, kernel, iterations=2)
-        #
-        # pyplot.imshow(mask)
-        # pyplot.show()
-        #
-        # contours = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        # contours = imutils.grab_contours(contours)
-        #
-        # if len(contours) > 0:
-        #     for c in contours:
-        #         #c = max(contours, key=cv2.contourArea)
-        #         ((x, y), r) = cv2.minEnclosingCircle(c)
-        #        # if r >= 3 and r <= 10:
-        #         approx = cv2.approxPolyDP(c, 0.001*cv2.arcLength(c, True), True)
-        #         if(len(approx) > 8):
-        #             circ_img = np.zeros((table.shape[0], table.shape[1]), np.uint8)
-        #             circ = cv2.circle(circ_img, (int(x), int(y)), int(r), (255,255,255), 2)
-        #             avg_color = cv2.mean(table, mask=circ_img)
-        #             #cont = cv2.drawContours(table, c, -1, (0, 255, 255), 2)
-        #             cv2.circle(table, (int(x), int(y)), int(r), (255,255,0), 2)
-        #             print(x,y,avg_color)
-        # pyplot.imshow(table)
-        # pyplot.show()
