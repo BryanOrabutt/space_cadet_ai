@@ -5,6 +5,7 @@ from win32gui import FindWindow, GetWindowRect
 import math
 from collections import deque
 import time
+from reward_gate import RewardGate
 
 
 class ScreenReader:
